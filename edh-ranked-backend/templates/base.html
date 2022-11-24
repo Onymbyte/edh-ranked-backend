@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <!-- Insert navigation bar HTML below -->
+    <div>
+      <a href="{{url_for('index')}}">Home</a>
+        | 
+      <a href="{{url_for('index')}}">About</a>
+      {% if user is defined %}
+      | 
+      <a href="{{url_for('profile', username=user.username)}}">Profile</a>
+      |
+      <a href="{{url_for('logout')}}">Logout</a>
+      {% else %}
+      |
+      <a href="{{url_for('register')}}">Register</a>
+      | 
+      <a href="{{url_for('login')}}">Login</a>
+      {% endif %}
+    </div>
+    {% block content %}
+    {% endblock %}
+  </body>
+</html>

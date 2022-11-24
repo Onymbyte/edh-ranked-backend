@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1> {{user.username}}</h1>
+
+<h2>Play Ratings</h2>
+<ul>
+    {% for rev in play %}
+    <li>{{rev.review}}</li>
+
+    {% endfor %}
+</ul>
+<h2>Enemy Ratings</h2>
+<ul>
+    {% for rev in enemy %}
+    <li>{{rev.review}}</li>
+
+    {% endfor %}
+</ul>
+<h2>Comments</h2>
+<ul>
+    {% for commment in comments %}
+    <li>{{comment.comment}}</li>
+
+    {% endfor %}
+</ul>
+{% endblock %}
