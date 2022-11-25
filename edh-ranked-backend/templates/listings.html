@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Listings{% endblock %}
+{% block content %}
+<div class="listings">
+    <h1>Listings</h1>
+</div>
+<h1>Listings</h1>
+<ul>
+    {% for listing in listings %}
+    <li><a href="{{url_for('listing', listing_id=listing.id)}}">{{listing.name}}</a></li>
+    {% endfor %}
+</ul>
+
+
+
+
+<div class="addListing">
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.name.label }}<br>
+            {{ form.name(size=32) }}<br>
+            {% for error in form.name.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+    
+</div>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}{{listing.name}}{% endblock %}
+{% block content %}
+<h1>
+    {{listing.name}}
+</h1>
+<p>
+    {% if listing.play_review_num %}
+    Play Stars : {{listing.play_star_total / listing.play_review_num}} ({{listing.play_review_num}} Reviews)<br>
+    {% else %}
+    Play Stars : 0 (0 Reviews)<br>
+    {% endif %}
+    {% if listing.enemy_review_num %}
+    Enemy Stars : {{listing.enemy_star_total / listing.enemy_review_num}} ({{listing.enemy_review_num}} Reviews)
+    {% else %}
+    Enemy Stars : 0 (0 Reviews)<br>
+    {% endif %}
+</p>
+<img src="{{imgUri}}" alt="">
+<div class="playRatings">
+    <h2>Play Ratings</h2>
+    <ul>
+        {% for rev in play %}
+        <li>{{rev.star}} Star(s) : "{{rev.review}}" - {{rev.author_username}} [{{rev.timestamp}}]</li>
+
+        {% endfor %}
+    </ul>
+    <div class="rate">
+        <h3>Add Play Rating</h3>
+        {% if form1 is defined %}
+        <form action="{{url_for('listing', listing_id=listing.id, formid=1)}}" method="post">
+            {{ form1.hidden_tag() }}
+            <p>
+                <h4>
+                    {{form1.stars.label}}
+                </h4>
+                {% for field in form1.stars %}
+                    {{field.label}}
+                    {{ field() }}
+                    <br>
+                {% endfor %}
+                {% for error in form1.review.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form1.review.label }}<br>
+                {{ form1.review() }}<br>
+                {% for error in form1.review.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>{{ form1.submit() }}</p>
+        </form>
+        {% endif %}
+    </div>
+</div>
+<div class="enemyRatings">
+    <h2>Enemy Ratings</h2>
+    <ul>
+        {% for rev in enemy %}
+        <li>{{rev.star}} Star(s) : "{{rev.review}}" - {{rev.author_username}} [{{rev.timestamp}}]</li>
+
+        {% endfor %}
+    </ul>
+    <div class="rate">
+        <h3>Add Enemy Rating</h3>
+        {% if form2 is defined %}
+        <form action="{{url_for('listing', listing_id=listing.id, formid=2)}}" method="post">
+            {{ form2.hidden_tag() }}
+            <p>
+                <h4>
+                    {{form2.stars.label}}
+                </h4>
+                {% for field in form2.stars %}
+                    {{field.label}}
+                    {{ field() }}
+                    <br>
+                {% endfor %}
+                {% for error in form2.review.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form2.review.label }}<br>
+                {{ form2.review() }}<br>
+                {% for error in form2.review.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>{{ form2.submit() }}</p>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<div class="comments">
+    <h2>Comments</h2>
+    <ul>
+        {% for comment in comments %}
+        <li>"{{comment.comment}}" - {{comment.author_username}} [{{comment.timestamp}}]</li>
+
+        {% endfor %}
+    </ul>
+    {% if form3 is defined %}
+    <form action="{{url_for('listing', listing_id=listing.id, formid=3)}}" method="post">
+        {{ form3.hidden_tag() }}
+        <p>
+            {{ form3.comment.label }}<br>
+            {{ form3.comment() }}<br>
+            {% for error in form3.comment.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form3.submit() }}</p>
+    </form>
+    {% endif %}
+</div>
+
+
+{% endblock %}

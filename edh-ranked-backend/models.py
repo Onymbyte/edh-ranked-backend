@@ -20,10 +20,10 @@ class Listing(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(db.String(36), index=True, unique=True)
     name = db.Column(db.String(36), index=True, unique=True)
-    play_review_num = db.Column(db.Integer, index=True, unique=False)
-    enemy_review_num = db.Column(db.Integer, index=True, unique=False)
-    play_star_total = db.Column(db.Integer, index=True, unique=False)
-    enemy_star_total = db.Column(db.Integer, index=True, unique=False)
+    play_review_num = db.Column(db.Integer, index=True, unique=False, default=0)
+    enemy_review_num = db.Column(db.Integer, index=True, unique=False, default=0)
+    play_star_total = db.Column(db.Integer, index=True, unique=False,default=0)
+    enemy_star_total = db.Column(db.Integer, index=True, unique=False, default=0)
     
 
 class PlayRating(db.Model):
@@ -31,25 +31,31 @@ class PlayRating(db.Model):
     star = db.Column(db.Integer, primary_key=True)
     review = db.Column(db.String(280), index=True, unique=False)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    author_username = db.Column(db.String(64), index=True, unique=False)
     listing_id = db.Column(db.Integer, db.ForeignKey('listing.id'))
     author = db.relationship("User",backref="playRating")
     listing = db.relationship("Listing", backref="playRating")
+    timestamp = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
 
 class EnemyRating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     star = db.Column(db.Integer, primary_key=True)
     review = db.Column(db.String(280), index=True, unique=False)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    author_username = db.Column(db.String(64), index=True, unique=False)
     listing_id = db.Column(db.Integer, db.ForeignKey('listing.id'))
     author = db.relationship("User", backref="enemyRating")
     listing = db.relationship("Listing", backref="enemyRating")
+    timestamp = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     comment = db.Column(db.String(280), index=True, unique=False)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    author_username = db.Column(db.String(64), index=True, unique=False)
     listing_id = db.Column(db.Integer, db.ForeignKey('listing.id'))
     author = db.relationship("User", backref="comment")
     listing = db.relationship("Listing", backref="comment")
+    timestamp = db.Column(db.DateTime(), index=True, default=datetime.utcnow)
 class Cards(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(db.String(36), index=True, unique=True)

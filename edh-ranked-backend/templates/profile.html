@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% block title %}{{user.username}} - Profile{% endblock %}
 {% block content %}
 
 <h1> {{user.username}}</h1>
@@ -20,7 +20,7 @@
 </ul>
 <h2>Comments</h2>
 <ul>
-    {% for commment in comments %}
+    {% for comment in comments %}
     <li>{{comment.comment}}</li>
 
     {% endfor %}
