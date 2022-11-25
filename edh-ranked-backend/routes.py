@@ -97,6 +97,36 @@ def listings():
     if current_user.is_authenticated:
         return render_template("listings.html", listings=listings, form=form, user=current_user)
     return render_template("listings.html", listings=listings, form=form)
+@app.route('/listings/<sortBy>', methods=['GET', 'POST'])
+def listings_sorted(sortBy):
+    sorts = {"playAsc": Listing.play_stars, "playDesc": Listing.play_stars.desc(), "enemyAsc": Listing.enemy_stars, "enemyDesc": Listing.enemy_stars.desc()}
+    if not sortBy in sorts.keys():
+        return redirect(url_for('listings'))
+    listings = Listing.query.order_by(sorts[sortBy]).limit(10).all()
+    
+    form = CreateListingForm()
+    if form.validate_on_submit():
+        success = addCommander(form.name.data)
+        
+        if success:
+            return redirect(url_for('listing', listing_id=success))
+    if current_user.is_authenticated:
+        return render_template("listings.html", listings=listings, form=form, user=current_user)
+    return render_template("listings.html", listings=listings, form=form)
+@app.route('/listings/search/', methods=['GET', 'POST'])
+def listings_search():
+    name = request.args['name']
+    listings = Listing.query.filter(Listing.name.like(f"%{name.replace(' ', '%')}%")).limit(10).all()
+    
+    form = CreateListingForm()
+    if form.validate_on_submit():
+        success = addCommander(form.name.data)
+        
+        if success:
+            return redirect(url_for('listing', listing_id=success))
+    if current_user.is_authenticated:
+        return render_template("listings.html", listings=listings, form=form, user=current_user)
+    return render_template("listings.html", listings=listings, form=form)
 
 
 @app.route('/listing/<listing_id>', methods=["GET", "POST"])
@@ -116,6 +146,7 @@ def listing(listing_id):
         prevRating = PlayRating.query.filter(PlayRating.author_id==current_user.id and PlayRating.listing_id==listing.id).first()
         if prevRating:
             listing.play_star_total += int(form2.stars.data) - prevRating.star
+            listing.play_stars = listing.play_star_total/listing.play_review_num
             prevRating.star = int(form2.stars.data)
             prevRating.review = form2.review.data
             prevRating.timestamp = now()
@@ -124,6 +155,8 @@ def listing(listing_id):
             playRating = PlayRating(star=form1.stars.data,review=form1.review.data ,author_id=current_user.id, author_username=current_user.username, listing_id=listing.id)
             listing.play_review_num += 1
             listing.play_star_total += int(form1.stars.data)
+            listing.play_stars = listing.play_star_total/listing.play_review_num
+            
             db.session.add(playRating)
             db.session.commit()
         return redirect(url_for('listing', listing_id=listing.id))
@@ -131,6 +164,7 @@ def listing(listing_id):
         prevRating = EnemyRating.query.filter(EnemyRating.author_id==current_user.id and EnemyRating.listing_id==listing.id).first()
         if prevRating:
             listing.enemy_star_total += int(form2.stars.data) - prevRating.star
+            listing.enemy_stars = listing.enemy_star_total/listing.enemy_review_num
             prevRating.star = int(form2.stars.data)
             prevRating.review = form2.review.data
             prevRating.timestamp = now()
@@ -139,6 +173,7 @@ def listing(listing_id):
             enemyRating = EnemyRating(star=form2.stars.data,review=form2.review.data ,author_id=current_user.id, author_username=current_user.username, listing_id=listing.id)
             listing.enemy_review_num += 1
             listing.enemy_star_total += int(form2.stars.data)
+            listing.enemy_stars = listing.enemy_star_total/listing.enemy_review_num
             db.session.add(enemyRating)
             db.session.commit()
         return redirect(url_for('listing', listing_id=listing.id))

@@ -20,6 +20,8 @@ class Listing(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(db.String(36), index=True, unique=True)
     name = db.Column(db.String(36), index=True, unique=True)
+    play_stars = db.Column(db.Float, index=True, unique=False, default=0)
+    enemy_stars = db.Column(db.Float, index=True, unique=False, default=0)
     play_review_num = db.Column(db.Integer, index=True, unique=False, default=0)
     enemy_review_num = db.Column(db.Integer, index=True, unique=False, default=0)
     play_star_total = db.Column(db.Integer, index=True, unique=False,default=0)

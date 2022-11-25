@@ -5,16 +5,8 @@
     {{listing.name}}
 </h1>
 <p>
-    {% if listing.play_review_num %}
-    Play Stars : {{listing.play_star_total / listing.play_review_num}} ({{listing.play_review_num}} Reviews)<br>
-    {% else %}
-    Play Stars : 0 (0 Reviews)<br>
-    {% endif %}
-    {% if listing.enemy_review_num %}
-    Enemy Stars : {{listing.enemy_star_total / listing.enemy_review_num}} ({{listing.enemy_review_num}} Reviews)
-    {% else %}
-    Enemy Stars : 0 (0 Reviews)<br>
-    {% endif %}
+    Play Stars : {{listing.play_stars}} ({{listing.play_review_num}} Reviews)<br>
+    Enemy Stars : {{listing.enemy_stars}} ({{listing.enemy_review_num}} Reviews)
 </p>
 <img src="{{imgUri}}" alt="">
 <div class="playRatings">

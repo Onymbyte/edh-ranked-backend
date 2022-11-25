@@ -1,26 +1,41 @@
 {% extends "base.html" %}
 {% block title %}Login{% endblock %}
 {% block content %}
-
-<h1 style="color:red">Sign In</h1>
-    <p>New User? <a href="{{ url_for('register') }}">Click to Register!</a></p>
+<main class="form-sigin w100 m-auto">
     <form action="" method="post">
         {{ form.hidden_tag() }}
-        <p>
-            {{ form.email.label }}<br>
-            {{ form.email(size=32) }}<br>
+        <h1 class="h3 mb-3 fw-normal mx-auto">Please Login</h1>
+        <h1 class="h5 mb-3 fw-normal mx-auto">New User? <a href="{{ url_for('register') }}">Click to Register!</a></h1>
+        <div class="form-floating">
+            {{ form.email(class="form-control", id="floatingInput") }}<br>
+            <label for="floatingInput">Email address</label>
             {% for error in form.email.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
-        </p>
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=32) }}<br>
+        </div>
+        <div class="form-floating">
+            {{ form.password(class="form-control", id="floatingPassword") }}
+            <label for="floatingPassword">Password</label>
             {% for error in form.password.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
-        </p>
-        <p>{{ form.remember() }} {{ form.remember.label }}</p>
-        <p>{{ form.submit() }}</p>
+        </div>
+        <div class="checkbox mb-3">
+            <label>
+                {{ form.remember() }}
+                Remember me
+            </label>
+        </div>
+        
+        <p>{{ form.submit(class="w-100 btn btn-lg btn-primary") }}</p>
     </form>
-    {% endblock %}
+</main>
+<style>
+    main, form {
+      margin: auto;
+      justify-content: center
+    }
+
+</style>
+    
+{% endblock %}

@@ -1,40 +1,42 @@
 {% extends "base.html" %}
 {% block title %}Register{% endblock %}
 {% block content %}
+<main class="form-signup wl00 m-auto">
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <h1 class="h3 mb-3 fw-normal mx-auto">Register Here</h1>
+        <div class="form-floating">
+            {{ form.username(class="form-control", id="floatingInput") }}
+            <label for="floatingInput">Username</label>
+            {% for error in form.username.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-floating">
+            {{ form.email(class="form-control", id="floatingEmail") }}
+            <label for="floatingEmail">Email address</label>
+            {% for error in form.email.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-floating">
+            {{ form.password(class="form-control", id="floatingPassword") }}
+            <label for="floatingPassword">Password</label>
+            {% for error in form.password.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-floating">
+            {{ form.passwordConfirm(class="form-control", id="floatingPasswordConfirm") }}
+            <label for="floatingPasswordConfirm">Repeat password</label>
+            {% for error in form.passwordConfirm.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <br>
+        <p>{{ form.submit(class="w-100 btn btn-lg btn-primary") }}</p>
+    </form>
+</main>
 
-<h1>Register Here</h1>
-
-<br>
-
-<h4>Sign Up</h4>
-<br>
-<form action="" method="post">
-    {{ form.hidden_tag() }}
-    <p>
-        {{ form.username(size=32,placeholder="username") }}<br>
-        {% for error in form.username.errors %}
-        <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p>
-        {{ form.email(size=32,placeholder="email@gmail.com") }}<br>
-        {% for error in form.email.errors %}
-        <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p>
-        {{ form.password(size=32,placeholder="password*$%!@") }}<br>
-        {% for error in form.password.errors %}
-        <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p>
-        {{ form.passwordConfirm(size=32,placeholder="password*$%!@") }}<br>
-        {% for error in form.passwordConfirm.errors %}
-        <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p>{{ form.submit() }}</p>
-</form>
 {% endblock %}
   

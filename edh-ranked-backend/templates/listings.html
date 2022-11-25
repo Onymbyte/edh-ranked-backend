@@ -3,18 +3,45 @@
 {% block content %}
 <div class="listings">
     <h1>Listings</h1>
+    <div class="sortBy">
+        <a class="btn btn-primary btn-sm" href="{{url_for('listings_sorted', sortBy='playAsc')}}" role="button">Play Rating ↑</a>
+        <a class="btn btn-primary btn-sm" href="{{url_for('listings_sorted', sortBy='playDesc')}}" role="button">Play Rating ↓</a>
+        <a class="btn btn-primary btn-sm" href="{{url_for('listings_sorted', sortBy='enemyAsc')}}" role="button">Enemy Rating ↑</a>
+        <a class="btn btn-primary btn-sm" href="{{url_for('listings_sorted', sortBy='enemyDesc')}}" role="button">Enemy Rating ↓</a>
+    </div>
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+            <th>Name</th>
+            <th>Color Identity</th>
+            <th>Play Rating</th>
+            <th>Enemy Rating</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for listing in listings %}
+        <tr>
+            <td><a href="{{url_for('listing', listing_id=listing.id)}}">{{listing.name}}</a></td>
+            <td>To Add</td>
+            <td>{{listing.play_stars}}</td>
+            <td>{{listing.enemy_stars}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <ul>
+        {% for listing in listings %}
+        <li><a href="{{url_for('listing', listing_id=listing.id)}}">{{listing.name}}</a></li>
+        {% endfor %}
+    </ul>
 </div>
-<h1>Listings</h1>
-<ul>
-    {% for listing in listings %}
-    <li><a href="{{url_for('listing', listing_id=listing.id)}}">{{listing.name}}</a></li>
-    {% endfor %}
-</ul>
 
 
 
 
-<div class="addListing">
+
+<div class="form-addListing">
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <p>

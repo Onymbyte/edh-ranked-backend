@@ -27,15 +27,15 @@
               </a>
               <ul class="dropdown-menu dropdown-menu-dark">
                 <li><a class="dropdown-item" href="{{url_for('listings')}}">Recent Commanders</a></li>
-                <li><a class="dropdown-item" href="{{url_for('listings')}}">Top Commanders To Play</a></li>
-                <li><a class="dropdown-item" href="{{url_for('listings')}}">Top Commanders To Play Against</a></li>
+                <li><a class="dropdown-item" href="{{url_for('listings_sorted', sortBy='playAsc')}}">Top Commanders To Play</a></li>
+                <li><a class="dropdown-item" href="{{url_for('listings_sorted', sortBy='enemyAsc')}}">Top Commanders To Play Against</a></li>
               </ul>
             </li>
             <li><a href="#" class="nav-link px-2 text-white">About</a></li>
           </ul>
   
-          <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
-            <input type="search" class="form-control form-control-dark text-bg-dark" placeholder="Search..." aria-label="Search">
+          <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search" action="{{url_for('listings_search')}}">
+            <input name="name" type="search" class="form-control form-control-dark text-bg-dark" placeholder="Search..." aria-label="Search">
           </form>
           
           <div class="text-end">
