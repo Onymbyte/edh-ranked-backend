@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{listing.name}} - Suggest Cards{% endblock %}
+{% block content %}
+<h1>
+    {{listing.name}}
+</h1>
+<p>
+    Play Stars : {{listing.play_stars}} ({{listing.play_review_num}} Reviews)<br>
+    Enemy Stars : {{listing.enemy_stars}} ({{listing.enemy_review_num}} Reviews)
+</p>
+<img src="{{imgUri}}" alt="">
+
+<div class="suggestedCards">
+    <ul>
+        {% for card, uri, cardMap in cards|zip(imgUris, card_map) %}
+        <li>
+            <a href="{{url_for('addCardReview', listing_id=listing.id, card_id=card.id)}}">{{card.name}}</a>: {{cardMap.play_stars}} ({{cardMap.play_review_num}} Reviews)
+            <img src="{{uri}}" alt="">
+            
+        </li>
+
+        {% endfor %}
+    </ul>
+    
+</div>
+{% if user is defined %}
+<div class="addCards">
+    <form action="" method="POST">
+        {{form1.hidden_tag()}}
+        {{form1.name.label}}
+        {{form1.name()}}
+        {{form1.submit()}}
+    </form>
+</div>
+{% endif %}
+
+{% endblock %}

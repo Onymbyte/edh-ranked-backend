@@ -10,6 +10,7 @@ app.debug = True
 app.config['SECRET_KEY'] = 'asdkhjfgkajsdhgjhdfbajvbhb'
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://onymbit:rutgers28@18.188.99.73:3306/edhRanked"
 app.config['sqlalchemy_track_modifications'.upper()] = False
+app.jinja_env.filters['zip'] = zip
 
 
 db = SQLAlchemy(app)

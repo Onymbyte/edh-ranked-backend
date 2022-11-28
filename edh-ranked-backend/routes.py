@@ -1,9 +1,9 @@
 from app import app, db, render_template, request, redirect, url_for
 from forms import *
-from models import User, PlayRating, EnemyRating, Comment, Listing
-from flask_login import login_user, login_required, current_user, logout_user, AnonymousUserMixin
+from models import User, PlayRating, EnemyRating, Comment, Listing, CardListMap, Cards, CardRating
+from flask_login import login_user, login_required, current_user, logout_user
 from time import sleep
-from scryUtil import addCommander, getImage
+from scryUtil import addCommander, getImage, addCard
 from datetime import datetime
 now = datetime.utcnow
 
@@ -87,46 +87,95 @@ def profile(username):
 @app.route('/listings', methods=['GET', 'POST'])
 # @async_action
 def listings():
-    listings = Listing.query.limit(10).all()
+    formid = request.args.get('formid', 1, type=int)
     form = CreateListingForm()
-    if form.validate_on_submit():
+    form2 = ColorIdentityForm()
+
+    colors= []
+    if form2.validate_on_submit() and formid==2:
+        if form2.white.data:
+            colors.append(Listing.color_identity.like('%W%'))
+        if form2.blue.data:
+            colors.append(Listing.color_identity.like('%U%'))
+        if form2.black.data:
+            colors.append(Listing.color_identity.like('%B%'))
+        if form2.red.data:
+            colors.append(Listing.color_identity.like('%R%'))
+        if form2.green.data:
+            colors.append(Listing.color_identity.like('%G%'))
+    listings = Listing.query.filter(*colors).limit(10).all()
+
+    if form.validate_on_submit() and formid == 1:
         success = addCommander(form.name.data)
         
         if success:
             return redirect(url_for('listing', listing_id=success))
     if current_user.is_authenticated:
-        return render_template("listings.html", listings=listings, form=form, user=current_user)
-    return render_template("listings.html", listings=listings, form=form)
+        return render_template("listings.html", listings=listings, form=form, form2=form2, user=current_user)
+    return render_template("listings.html", listings=listings, form=form, form2=form2)
 @app.route('/listings/<sortBy>', methods=['GET', 'POST'])
 def listings_sorted(sortBy):
-    sorts = {"playAsc": Listing.play_stars, "playDesc": Listing.play_stars.desc(), "enemyAsc": Listing.enemy_stars, "enemyDesc": Listing.enemy_stars.desc()}
+    formid = request.args.get('formid', 1, type=int)
+    form = CreateListingForm()
+    form2 = ColorIdentityForm()
+    sorts = {"playAsc": Listing.play_stars, "playDesc": Listing.play_stars.desc(), "enemyAsc": Listing.enemy_stars, "enemyDesc": Listing.enemy_stars.desc(), "cmcAsc": Listing.cmc, "cmcDesc": Listing.cmc.desc()}
     if not sortBy in sorts.keys():
         return redirect(url_for('listings'))
-    listings = Listing.query.order_by(sorts[sortBy]).limit(10).all()
+    colors= []
+    if form2.validate_on_submit() and formid==2:
+        if form2.white.data:
+            colors.append(Listing.color_identity.like('%W%'))
+        if form2.blue.data:
+            colors.append(Listing.color_identity.like('%U%'))
+        if form2.black.data:
+            colors.append(Listing.color_identity.like('%B%'))
+        if form2.red.data:
+            colors.append(Listing.color_identity.like('%R%'))
+        if form2.green.data:
+            colors.append(Listing.color_identity.like('%G%'))
+        
+    listings = Listing.query.filter(*colors).order_by(sorts[sortBy]).limit(10).all()
     
-    form = CreateListingForm()
-    if form.validate_on_submit():
+    
+    if form.validate_on_submit() and formid==1:
         success = addCommander(form.name.data)
         
         if success:
             return redirect(url_for('listing', listing_id=success))
+    
     if current_user.is_authenticated:
-        return render_template("listings.html", listings=listings, form=form, user=current_user)
-    return render_template("listings.html", listings=listings, form=form)
+        return render_template("listings.html", listings=listings, form=form, form2=form2, user=current_user)
+    return render_template("listings.html", listings=listings, form=form, form2=form2)
 @app.route('/listings/search/', methods=['GET', 'POST'])
 def listings_search():
-    name = request.args['name']
-    listings = Listing.query.filter(Listing.name.like(f"%{name.replace(' ', '%')}%")).limit(10).all()
-    
+    formid = request.args.get('formid', 1, type=int)
     form = CreateListingForm()
-    if form.validate_on_submit():
+    form2 = ColorIdentityForm()
+    name = request.args['name']
+
+    colors= []
+    if form2.validate_on_submit() and formid==2:
+        if form2.white.data:
+            colors.append(Listing.color_identity.like('%W%'))
+        if form2.blue.data:
+            colors.append(Listing.color_identity.like('%U%'))
+        if form2.black.data:
+            colors.append(Listing.color_identity.like('%B%'))
+        if form2.red.data:
+            colors.append(Listing.color_identity.like('%R%'))
+        if form2.green.data:
+            colors.append(Listing.color_identity.like('%G%'))
+
+    listings = Listing.query.filter(Listing.name.like(f"%{name.replace(' ', '%')}%", *colors)).limit(10).all()
+
+    if form.validate_on_submit() and formid==1:
         success = addCommander(form.name.data)
         
         if success:
             return redirect(url_for('listing', listing_id=success))
     if current_user.is_authenticated:
-        return render_template("listings.html", listings=listings, form=form, user=current_user)
-    return render_template("listings.html", listings=listings, form=form)
+        return render_template("listings.html", listings=listings, form=form,form2=form2, user=current_user)
+    return render_template("listings.html", listings=listings, form=form, form2=form2)
 
 
 @app.route('/listing/<listing_id>', methods=["GET", "POST"])
@@ -143,7 +192,7 @@ def listing(listing_id):
     form3 = CommentForm()
 
     if form1.validate_on_submit() and current_user.is_authenticated and formid == 1:
-        prevRating = PlayRating.query.filter(PlayRating.author_id==current_user.id and PlayRating.listing_id==listing.id).first()
+        prevRating = PlayRating.query.filter_by(author_id=current_user.id, listing_id=listing.id).first()
         if prevRating:
             listing.play_star_total += int(form2.stars.data) - prevRating.star
             listing.play_stars = listing.play_star_total/listing.play_review_num
@@ -155,7 +204,7 @@ def listing(listing_id):
             playRating = PlayRating(star=form1.stars.data,review=form1.review.data ,author_id=current_user.id, author_username=current_user.username, listing_id=listing.id)
             listing.play_review_num += 1
             listing.play_star_total += int(form1.stars.data)
-            listing.play_stars = listing.play_star_total/listing.play_review_num
+            listing.play_stars = (listing.play_star_total + int(form1.stars.data))/(listing.play_review_num+1)
             
             db.session.add(playRating)
             db.session.commit()
@@ -183,6 +232,7 @@ def listing(listing_id):
         db.session.commit()
         return redirect(url_for('listing', listing_id=listing.id))
     
+    
     kwargs['play'] = PlayRating.query.filter_by(listing_id=listing.id).order_by(PlayRating.timestamp).all()
     kwargs['enemy'] = EnemyRating.query.filter_by(listing_id=listing.id).order_by(EnemyRating.timestamp).all()
     kwargs['comments'] = Comment.query.filter_by(listing_id=listing.id).order_by(Comment.timestamp).all()
@@ -196,4 +246,88 @@ def listing(listing_id):
         kwargs['form3'] = form3
     return render_template('listing.html', **kwargs)
 
+@app.route('/listing/<listing_id>/suggestedCards', methods=["GET", "POST"])
+def listing_cards(listing_id):
+    formid = request.args.get('formid', 1, type=int)
+    kwargs = {}
+    listing = Listing.query.get(listing_id)
+    if not listing:
+        return redirect(url_for("listings"))
+    kwargs['listing'] = listing
+
+    form1 = AddCardForm()
+
+    if form1.validate_on_submit() and current_user.is_authenticated  and formid==1:
+        card_id = addCard(form1.name.data, listing)
+        if not card_id:
+            print("Card is not in commander's colors or did not exist.")
+            return redirect(url_for('listing_cards', listing_id=listing_id))
+        if CardListMap.query.filter_by(card_id=card_id, listing_id=listing_id).first() is not None:
+            print('Card was already suggested.')
+            return redirect(url_for('listing_cards', listing_id=listing_id))
+        card_map = CardListMap(card_id=card_id, listing_id=listing_id)
+        db.session.add(card_map)
+        db.session.commit()
+        return redirect(url_for('listing_cards', listing_id=listing_id))
+    
+    card_map = CardListMap.query.filter_by(listing_id=listing_id).all()
+    cards = list(map(lambda card_map_i: Cards.query.get(card_map_i.card_id), card_map))
+    kwargs['cards'] = cards
+    kwargs['card_map'] = card_map
+    kwargs['imgUri'] = getImage(listing.uuid, size='normal')
+    kwargs['imgUris'] = list(map(lambda card: getImage(card.uuid), cards))
+
+    if current_user.is_authenticated:
+        kwargs['user'] = current_user
+        kwargs['form1'] = form1
+
+    return render_template('listing_cards.html', **kwargs)
+@app.route('/listing/<listing_id>/addCardReview/<card_id>', methods=["GET", "POST"])
+@login_required
+def addCardReview(listing_id, card_id):
+    kwargs = {}
+    listing = Listing.query.get(listing_id)
+    card = Cards.query.get(card_id)
+    card_map = CardListMap.query.filter_by(listing_id=listing_id, card_id=card_id).first()
+    if (not card_map) | (not listing) | (not card):
+        return redirect(url_for("listing_cards", listing_id=listing_id))
+
+    kwargs['listing'] = listing
+    kwargs['card'] = card
+    kwargs['card_map'] = card_map
+    kwargs['imgUri'] = getImage(listing.uuid, size='normal')
+    kwargs['cardUri'] = getImage(card.uuid, size='normal')
+
+    form1 = AddCardRatingForm()
+
+    if form1.validate_on_submit() and current_user.is_authenticated:
         
+        prevRating = CardRating.query.filter_by(author_id=current_user.id, listing_id=listing_id, card_id=card_id).first()
+        if prevRating:
+            card_map.play_star_total += int(form1.stars.data) - prevRating.star
+            card_map.play_stars = card_map.play_star_total/card_map.play_review_num
+            prevRating.star = int(form1.stars.data)
+            db.session.commit()
+        else:
+            cardRating = CardRating(star=form1.stars.data ,author_id=current_user.id, listing_id=listing.id, card_id=card_id)
+            card_map.play_review_num += 1
+            card_map.play_star_total += int(form1.stars.data)
+            card_map.play_stars = (card_map.play_star_total + int(form1.stars.data))/(card_map.play_review_num+1)
+            
+            db.session.add(cardRating)
+            db.session.commit()
+        return redirect(url_for('listing_cards', listing_id=listing.id))
+
+    if current_user.is_authenticated:
+        kwargs['user'] = current_user
+        kwargs['form1'] = form1
+
+    return render_template('addCardRating.html', **kwargs)
+
+
+
+
+
+
+
+

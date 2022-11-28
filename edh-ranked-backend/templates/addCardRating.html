@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{listing.name}} - Rate {{card.name}}{% endblock %}
+{% block content %}
+<h1>
+    {{listing.name}}
+</h1>
+<p>
+    Play Stars : {{listing.play_stars}} ({{listing.play_review_num}} Reviews)<br>
+    Enemy Stars : {{listing.enemy_stars}} ({{listing.enemy_review_num}} Reviews)
+</p>
+<img src="{{imgUri}}" alt="">
+<h2>{{card.name}}</h2>
+<p>{{card_map.play_stars}} ({{card_map.play_review_num}} Reviews)</p>
+<img src="{{cardUri}}" alt="">
+<div class="rate">
+    <h3>Add Card Rating</h3>
+    {% if form1 is defined %}
+    <form action="" method="post">
+        {{ form1.hidden_tag() }}
+        <p>
+            <h4>
+                {{form1.stars.label}}
+            </h4>
+            {% for field in form1.stars %}
+                {{field.label}}
+                {{ field() }}
+                <br>
+            {% endfor %}
+            {% for error in form1.stars.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form1.submit() }}</p>
+    </form>
+    {% endif %}
+</div>
+
+{% endblock %}

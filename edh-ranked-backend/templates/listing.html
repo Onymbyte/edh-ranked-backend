@@ -6,8 +6,10 @@
 </h1>
 <p>
     Play Stars : {{listing.play_stars}} ({{listing.play_review_num}} Reviews)<br>
-    Enemy Stars : {{listing.enemy_stars}} ({{listing.enemy_review_num}} Reviews)
+    Enemy Stars : {{listing.enemy_stars}} ({{listing.enemy_review_num}} Reviews)<br>
+    <a class="btn btn-primary btn-sm" href="{{url_for('listing_cards', listing_id=listing.id)}}" role="button">Suggested Cards</a>
 </p>
+
 <img src="{{imgUri}}" alt="">
 <div class="playRatings">
     <h2>Play Ratings</h2>
