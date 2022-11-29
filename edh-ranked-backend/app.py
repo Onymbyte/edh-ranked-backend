@@ -8,8 +8,12 @@ from flask_bootstrap import Bootstrap5
 
 app = Flask(__name__)
 app.debug = True
-app.config['SECRET_KEY'] = 'asdkhjfgkajsdhgjhdfbajvbhb'
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://onymbit:rutgers28@18.188.99.73:3306/edhRanked"
+
+with open('config.txt', 'r') as f:
+    lines = f.readlines()
+    app.config['SECRET_KEY'] = lines[0]
+    app.config['SQLALCHEMY_DATABASE_URI'] = lines[1]
+
 app.config['sqlalchemy_track_modifications'.upper()] = False
 app.jinja_env.filters['zip'] = zip
 
