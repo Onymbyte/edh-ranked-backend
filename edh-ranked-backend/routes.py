@@ -6,15 +6,19 @@ from time import sleep
 from scryUtil import addCommander, getImage, addCard
 from datetime import datetime
 now = datetime.utcnow
+from flask import flash
+
+ROWS_PER_PAGE = 5
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     # db.drop_all() 
     # db.create_all()
     if not current_user.is_authenticated:
-        return render_template("base.html")
+        return render_template("index.html")
     else:
-        return render_template("base.html", user=current_user)
+        return render_template("index.html", user=current_user)
 @app.route('/test', methods=['GET', 'POST'])
 def test():
     db.drop_all() 
@@ -25,21 +29,22 @@ def test():
     db.session.add(user)
     db.session.commit()
     if not current_user.is_authenticated:
-        return render_template("base.html")
+        return render_template("index.html")
     else:
-        return render_template("base.html", user=current_user)
+        return render_template("index.html", user=current_user)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
         if User.query.filter((User.username==form.username.data) | (User.email==form.email.data)).first() is not None:
-            print("User already exists with that Username or Email.")
+            flash("User already exists with that Username or Email.")
             return render_template('register.html', form=RegisterForm())
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
+        return redirect(url_for('login'))
     if current_user.is_authenticated:
        return redirect(url_for('index')) 
     return render_template('register.html', form=form)
@@ -57,11 +62,12 @@ def login():
         try:
             login_user(user, remember=form.remember.data)
         except:
-            print('Login Failed')
+            flash('Login Failed')
         print("User was logged in.")
         next_page = url_for('profile', username=user.username)
         return redirect(next_page) if next_page else redirect(url_for('index', _external=True, _scheme='https'))
     else:
+        flash('Email or password was incorrect')
         return redirect(url_for('login', _external=True))
   if current_user.is_authenticated:
     return redirect(url_for('index'))
@@ -76,17 +82,21 @@ def logout():
 
 
 @app.route('/profile/<username>')
-@login_required
 def profile(username):
-    user = User.query.filter_by(username=username).first()
-    playRatings = PlayRating.query.filter_by(author_id=user.id).all()
-    enemyRatings = EnemyRating.query.filter_by(author_id=user.id).all()
-    comments = Comment.query.filter_by(author_id=user.id).all()
-    return render_template('profile.html', user=user, play=playRatings, enemy=enemyRatings, comments=comments)
+    kwargs = {}
+    kwargs['user'] = user = User.query.filter_by(username=username).first()
+    kwargs['play'] = PlayRating.query.filter_by(author_id=user.id).all()
+    kwargs['playListings'] = map(lambda rating: Listing.query.get(rating.listing_id), kwargs['play'])
+    kwargs['enemy'] = EnemyRating.query.filter_by(author_id=user.id).all()
+    kwargs['enemyListings'] = map(lambda rating: Listing.query.get(rating.listing_id), kwargs['enemy'])
+    kwargs['comments'] = Comment.query.filter_by(author_id=user.id).all()
+    kwargs['commentsListings'] = map(lambda rating: Listing.query.get(rating.listing_id), kwargs['comments'])
+    return render_template('profile.html', **kwargs)
 
 @app.route('/listings', methods=['GET', 'POST'])
 # @async_action
 def listings():
+    page = request.args.get('page', 1, type=int)
     formid = request.args.get('formid', 1, type=int)
     form = CreateListingForm()
     form2 = ColorIdentityForm()
@@ -103,18 +113,21 @@ def listings():
             colors.append(Listing.color_identity.like('%R%'))
         if form2.green.data:
             colors.append(Listing.color_identity.like('%G%'))
-    listings = Listing.query.filter(*colors).limit(10).all()
+    listings = Listing.query.filter(*colors).distinct().paginate(page=page, per_page=ROWS_PER_PAGE)
 
     if form.validate_on_submit() and formid == 1:
         success = addCommander(form.name.data)
         
         if success:
             return redirect(url_for('listing', listing_id=success))
+        else:
+            flash('Single card could not be found or was not a valid commander.')
     if current_user.is_authenticated:
         return render_template("listings.html", listings=listings, form=form, form2=form2, user=current_user)
     return render_template("listings.html", listings=listings, form=form, form2=form2)
 @app.route('/listings/<sortBy>', methods=['GET', 'POST'])
 def listings_sorted(sortBy):
+    page = request.args.get('page', 1, type=int)
     formid = request.args.get('formid', 1, type=int)
     form = CreateListingForm()
     form2 = ColorIdentityForm()
@@ -134,7 +147,7 @@ def listings_sorted(sortBy):
         if form2.green.data:
             colors.append(Listing.color_identity.like('%G%'))
         
-    listings = Listing.query.filter(*colors).order_by(sorts[sortBy]).limit(10).all()
+    listings = Listing.query.filter(*colors).order_by(sorts[sortBy]).distinct().paginate(page=page, per_page=ROWS_PER_PAGE)
     
     
     if form.validate_on_submit() and formid==1:
@@ -148,6 +161,7 @@ def listings_sorted(sortBy):
     return render_template("listings.html", listings=listings, form=form, form2=form2)
 @app.route('/listings/search/', methods=['GET', 'POST'])
 def listings_search():
+    page = request.args.get('page', 1, type=int)
     formid = request.args.get('formid', 1, type=int)
     form = CreateListingForm()
     form2 = ColorIdentityForm()
@@ -166,7 +180,7 @@ def listings_search():
         if form2.green.data:
             colors.append(Listing.color_identity.like('%G%'))
 
-    listings = Listing.query.filter(Listing.name.like(f"%{name.replace(' ', '%')}%", *colors)).limit(10).all()
+    listings = Listing.query.filter(Listing.name.like(f"%{name.replace(' ', '%')}%", *colors)).distinct().paginate(page=page, per_page=ROWS_PER_PAGE)
 
     if form.validate_on_submit() and formid==1:
         success = addCommander(form.name.data)
@@ -248,6 +262,7 @@ def listing(listing_id):
 
 @app.route('/listing/<listing_id>/suggestedCards', methods=["GET", "POST"])
 def listing_cards(listing_id):
+    page = request.args.get('page', 1, type=int)
     formid = request.args.get('formid', 1, type=int)
     kwargs = {}
     listing = Listing.query.get(listing_id)
@@ -260,17 +275,17 @@ def listing_cards(listing_id):
     if form1.validate_on_submit() and current_user.is_authenticated  and formid==1:
         card_id = addCard(form1.name.data, listing)
         if not card_id:
-            print("Card is not in commander's colors or did not exist.")
+            flash("Card is not in commander's colors or did not exist.")
             return redirect(url_for('listing_cards', listing_id=listing_id))
         if CardListMap.query.filter_by(card_id=card_id, listing_id=listing_id).first() is not None:
-            print('Card was already suggested.')
+            flash('Card was already suggested.')
             return redirect(url_for('listing_cards', listing_id=listing_id))
         card_map = CardListMap(card_id=card_id, listing_id=listing_id)
         db.session.add(card_map)
         db.session.commit()
         return redirect(url_for('listing_cards', listing_id=listing_id))
     
-    card_map = CardListMap.query.filter_by(listing_id=listing_id).all()
+    card_map = CardListMap.query.filter_by(listing_id=listing_id).order_by(CardListMap.play_stars.desc()).distinct().paginate(page=page, per_page=ROWS_PER_PAGE)
     cards = list(map(lambda card_map_i: Cards.query.get(card_map_i.card_id), card_map))
     kwargs['cards'] = cards
     kwargs['card_map'] = card_map

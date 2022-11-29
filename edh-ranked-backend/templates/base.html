@@ -1,3 +1,5 @@
+{% from 'bootstrap5/form.html' import render_form %}
+{% from 'bootstrap4/utils.html' import render_messages %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -32,7 +34,7 @@
                 <li><a class="dropdown-item" href="{{url_for('listings_sorted', sortBy='enemyDesc')}}">Top Commanders To Play Against</a></li>
               </ul>
             </li>
-            <li><a href="#" class="nav-link px-2 text-white">About</a></li>
+            <!-- <li><a href="#" class="nav-link px-2 text-white">About</a></li> -->
           </ul>
   
           <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search" action="{{url_for('listings_search')}}">
@@ -51,7 +53,7 @@
         </div>
       </div>
     </header>
-    <!-- Insert navigation bar HTML below -->
+    {{render_messages()}}
     
     {% block content %}
     {% endblock %}

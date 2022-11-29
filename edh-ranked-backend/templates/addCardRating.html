@@ -15,7 +15,8 @@
 <div class="rate">
     <h3>Add Card Rating</h3>
     {% if form1 is defined %}
-    <form action="" method="post">
+    {{render_form(form1)}}
+    <!-- <form action="" method="post">
         {{ form1.hidden_tag() }}
         <p>
             <h4>
@@ -31,7 +32,7 @@
             {% endfor %}
         </p>
         <p>{{ form1.submit() }}</p>
-    </form>
+    </form> -->
     {% endif %}
 </div>
 

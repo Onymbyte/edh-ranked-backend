@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_mysqldb import MySQL
+from flask_bootstrap import Bootstrap5
 
 app = Flask(__name__)
 app.debug = True
@@ -17,6 +18,8 @@ db = SQLAlchemy(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+bootstrap = Bootstrap5(app)
 
 from models import *
 

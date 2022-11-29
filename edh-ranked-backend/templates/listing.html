@@ -13,6 +13,28 @@
 <img src="{{imgUri}}" alt="">
 <div class="playRatings">
     <h2>Play Ratings</h2>
+    <table class="table table-striped">
+        <thead><tr>
+            <th>Stars</th>
+            <th>Review</th>
+            <th>Author</th>
+            <th>Post Time</th>
+        </tr></thead>
+        <tbody>
+            {% for rev in play %}
+            <tr>
+                <td>{{rev.star}} 🌟</td>
+                <td>{% if rev.review %}{{rev.review}} {% else %}[No Review]{% endif %}</td>
+                <td><a href="{{url_for('profile', username=rev.author_username)}}">{{rev.author_username}}</a></td>
+                <td>{{rev.timestamp}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+
+
+
     <ul>
         {% for rev in play %}
         <li>{{rev.star}} Star(s) : "{{rev.review}}" - {{rev.author_username}} [{{rev.timestamp}}]</li>
@@ -20,9 +42,11 @@
         {% endfor %}
     </ul>
     <div class="rate">
-        <h3>Add Play Rating</h3>
         {% if form1 is defined %}
-        <form action="{{url_for('listing', listing_id=listing.id, formid=1)}}" method="post">
+        <h3>Add Play Rating</h3>
+        
+        {{render_form(form1, action=url_for('listing', listing_id=listing.id, formid=1))}}
+        <!-- <form action="{{url_for('listing', listing_id=listing.id, formid=1)}}" method="post">
             {{ form1.hidden_tag() }}
             <p>
                 <h4>
@@ -45,22 +69,37 @@
                 {% endfor %}
             </p>
             <p>{{ form1.submit() }}</p>
-        </form>
+        </form> -->
         {% endif %}
     </div>
 </div>
 <div class="enemyRatings">
     <h2>Enemy Ratings</h2>
-    <ul>
-        {% for rev in enemy %}
-        <li>{{rev.star}} Star(s) : "{{rev.review}}" - {{rev.author_username}} [{{rev.timestamp}}]</li>
-
-        {% endfor %}
-    </ul>
+    <table class="table table-striped">
+        <thead><tr>
+            <th>Stars</th>
+            <th>Review</th>
+            <th>Author</th>
+            <th>Post Time</th>
+        </tr></thead>
+        <tbody>
+            {% for rev in enemy %}
+            <tr>
+                <td>{{rev.star}} 🌟</td>
+                <td>{% if rev.review %}{{rev.review}} {% else %}[No Review]{% endif %}</td>
+                <td><a href="{{url_for('profile', username=rev.author_username)}}">{{rev.author_username}}</a></td>
+                <td>{{rev.timestamp}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
     <div class="rate">
-        <h3>Add Enemy Rating</h3>
         {% if form2 is defined %}
-        <form action="{{url_for('listing', listing_id=listing.id, formid=2)}}" method="post">
+
+        <h3>Add Enemy Rating</h3>
+        {{render_form(form2, action=url_for('listing', listing_id=listing.id, formid=2))}}
+        <!-- <form action="{{url_for('listing', listing_id=listing.id, formid=2)}}" method="post">
             {{ form2.hidden_tag() }}
             <p>
                 <h4>
@@ -83,21 +122,34 @@
                 {% endfor %}
             </p>
             <p>{{ form2.submit() }}</p>
-        </form>
+        </form> -->
         {% endif %}
     </div>
 </div>
 
 <div class="comments">
     <h2>Comments</h2>
-    <ul>
-        {% for comment in comments %}
-        <li>"{{comment.comment}}" - {{comment.author_username}} [{{comment.timestamp}}]</li>
-
-        {% endfor %}
-    </ul>
+    <table class="table table-striped">
+        <thead><tr>
+            <th>Comment</th>
+            <th>Author</th>
+            <th>Post Time</th>
+        </tr></thead>
+        <tbody>
+            {% for comment in comments %}
+            <tr>
+                <td>{{comment.comment}}</td>
+                <td><a href="{{url_for('profile', username=comment.author_username)}}">{{comment.author_username}}</a></td>
+                <td>{{comment.timestamp}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
     {% if form3 is defined %}
-    <form action="{{url_for('listing', listing_id=listing.id, formid=3)}}" method="post">
+    <h1>Add Comment</h1>
+    {{render_form(form3, action=url_for('listing', listing_id=listing.id, formid=3))}}
+    <!-- <form action="{{url_for('listing', listing_id=listing.id, formid=3)}}" method="post">
         {{ form3.hidden_tag() }}
         <p>
             {{ form3.comment.label }}<br>
@@ -107,7 +159,7 @@
             {% endfor %}
         </p>
         <p>{{ form3.submit() }}</p>
-    </form>
+    </form> -->
     {% endif %}
 </div>
 

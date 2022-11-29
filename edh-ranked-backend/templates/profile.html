@@ -5,24 +5,58 @@
 <h1> {{user.username}}</h1>
 
 <h2>Play Ratings</h2>
-<ul>
-    {% for rev in play %}
-    <li>{{rev.review}}</li>
-
-    {% endfor %}
-</ul>
+<table class="table table-striped">
+    <thead><tr>
+        <th>Commander</th>
+        <th>Stars</th>
+        <th>Review</th>
+        <th>Post Time</th>
+    </tr></thead>
+    <tbody>
+        {% for rev, listing in play | zip(playListings) %}
+        <tr>
+            <td><a href="{{url_for('listing', listing_id=listing.id)}}">{{listing.name}}</a></td>
+            <td>{{rev.star}} 🌟</td>
+            <td>{% if rev.review %}{{rev.review}} {% else %}[No Review]{% endif %}</td>
+            <td>{{rev.timestamp}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 <h2>Enemy Ratings</h2>
-<ul>
-    {% for rev in enemy %}
-    <li>{{rev.review}}</li>
-
-    {% endfor %}
-</ul>
+<table class="table table-striped">
+    <thead><tr>
+        <th>Commander</th>
+        <th>Stars</th>
+        <th>Review</th>
+        <th>Post Time</th>
+    </tr></thead>
+    <tbody>
+        {% for rev, listing in enemy | zip(enemyListings) %}
+        <tr>
+            <td><a href="{{url_for('listing', listing_id=listing.id)}}">{{listing.name}}</a></td>
+            <td>{{rev.star}} 🌟</td>
+            <td>{% if rev.review %}{{rev.review}} {% else %}[No Review]{% endif %}</td>
+            <td>{{rev.timestamp}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 <h2>Comments</h2>
-<ul>
-    {% for comment in comments %}
-    <li>{{comment.comment}}</li>
-
-    {% endfor %}
-</ul>
+<table class="table table-striped">
+    <thead><tr>
+        <th>Commander</th>
+        <th>Comment</th>
+        <th>Post Time</th>
+    </tr></thead>
+    <tbody>
+        {% for comment, listing in comments | zip(commentsListings) %}
+        <tr>
+            <td><a href="{{url_for('listing', listing_id=listing.id)}}">{{listing.name}}</a></td>
+            <td>{{comment.comment}}</td>
+            <td>{{comment.timestamp}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

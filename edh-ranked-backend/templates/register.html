@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Register{% endblock %}
 {% block content %}
-<main class="form-signup wl00 m-auto">
+
+
+<h1>Register Here</h1>
+{{render_form(form)}}
+<!-- <main class="form-signup wl00 m-auto">
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <h1 class="h3 mb-3 fw-normal mx-auto">Register Here</h1>
@@ -36,7 +40,7 @@
         <br>
         <p>{{ form.submit(class="w-100 btn btn-lg btn-primary") }}</p>
     </form>
-</main>
+</main> -->
 
 {% endblock %}
   

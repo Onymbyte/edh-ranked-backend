@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Login{% endblock %}
 {% block content %}
-<main class="form-sigin w100 m-auto">
+<h1 class="h1 mb-3 fw-normal mx-auto">Login</h1>
+{{render_form(form)}}
+<!-- <main class="form-sigin w100 m-auto">
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <h1 class="h3 mb-3 fw-normal mx-auto">Please Login</h1>
@@ -29,13 +31,6 @@
         
         <p>{{ form.submit(class="w-100 btn btn-lg btn-primary") }}</p>
     </form>
-</main>
-<style>
-    main, form {
-      margin: auto;
-      justify-content: center
-    }
-
-</style>
+</main> -->
     
 {% endblock %}

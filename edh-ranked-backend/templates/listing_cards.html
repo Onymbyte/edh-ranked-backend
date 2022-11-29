@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from 'bootstrap4/pagination.html' import render_pagination %}
 {% block title %}{{listing.name}} - Suggest Cards{% endblock %}
 {% block content %}
 <h1>
@@ -11,26 +12,40 @@
 <img src="{{imgUri}}" alt="">
 
 <div class="suggestedCards">
-    <ul>
-        {% for card, uri, cardMap in cards|zip(imgUris, card_map) %}
-        <li>
-            <a href="{{url_for('addCardReview', listing_id=listing.id, card_id=card.id)}}">{{card.name}}</a>: {{cardMap.play_stars}} ({{cardMap.play_review_num}} Reviews)
-            <img src="{{uri}}" alt="">
-            
-        </li>
-
+    <h2>Suggested Cards</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Card Image</th>
+                <th>Name (Click to Review)</th>
+                <th>Ratings</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for card, uri, cardMap in cards|zip(imgUris, card_map) %}
+            <tr>
+                <td><img src="{{uri}}" alt=""></td>
+                <td><h3><a href="{{url_for('addCardReview', listing_id=listing.id, card_id=card.id)}}">{{card.name}}</a></h3></td>
+                <td><h3>&#127775; {{cardMap.play_stars}} ({{cardMap.play_review_num}} Reviews)</h3></td>
+            </tr>
         {% endfor %}
-    </ul>
+        </tbody>
+    </table>
+    {{render_pagination(card_map)}}
     
 </div>
 {% if user is defined %}
 <div class="addCards">
-    <form action="" method="POST">
+    {% if form1 is defined %}
+    <h3>Suggest A Card That Works Well With {{listing.name}}</h3>
+    {{render_form(form1)}}
+    <!-- <form action="" method="POST">
         {{form1.hidden_tag()}}
         {{form1.name.label}}
         {{form1.name()}}
         {{form1.submit()}}
-    </form>
+    </form> -->
+    {% endif %}
 </div>
 {% endif %}
 
