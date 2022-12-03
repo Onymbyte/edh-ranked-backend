@@ -24,8 +24,8 @@
         <tbody>
             {% for card, uri, cardMap in cards|zip(imgUris, card_map) %}
             <tr>
-                <td><img src="{{uri}}" alt=""></td>
-                <td><h3><a href="{{url_for('addCardReview', listing_id=listing.id, card_id=card.id)}}">{{card.name}}</a></h3></td>
+                <td><img src="{{uri}}" alt=""></td> 
+                <td><h3>{% if user is defined %}<a href="{{url_for('addCardReview', listing_id=listing.id, card_id=card.id)}}">{{card.name}}</a>{% else%}{{card.name}}{% endif %}</h3></td>
                 <td><h3>&#127775; {{cardMap.play_stars}} ({{cardMap.play_review_num}} Reviews)</h3></td>
             </tr>
         {% endfor %}

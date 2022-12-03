@@ -33,7 +33,7 @@ class Listing(db.Model):
 
 class PlayRating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    star = db.Column(db.Integer, primary_key=True)
+    star = db.Column(db.Integer, index=True)
     review = db.Column(db.String(280), index=True, unique=False)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     author_username = db.Column(db.String(64), index=True, unique=False)
@@ -44,7 +44,7 @@ class PlayRating(db.Model):
 
 class EnemyRating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    star = db.Column(db.Integer, primary_key=True)
+    star = db.Column(db.Integer, index=True)
     review = db.Column(db.String(280), index=True, unique=False)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     author_username = db.Column(db.String(64), index=True, unique=False)
