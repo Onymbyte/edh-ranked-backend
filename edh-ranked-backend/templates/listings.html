@@ -1,32 +1,52 @@
 {% extends "base.html" %}
-{% from 'bootstrap4/pagination.html' import render_pagination %}
+{% from 'bootstrap5/pagination.html' import render_pagination %}
 {% block title %}Listings{% endblock %}
 {% block content %}
-<div class="listings">
+<script>
+    $(document).ready(function() {
+        [$("#colorForm :input")].forEach((x,i) => i.addEventListener('change', function() {$("#colorForm").submit()}))
+});
+    function submitForm(){
+        $("#colorForm").submit()
+    }
+</script>
+<div class="listings container py-4">
     <h1>Listings</h1>
-    <div class="sortBy">
-        <a class="btn btn-primary btn-sm" href="{{url_for('listings_sorted', sortBy='playAsc')}}" role="button">Play Rating ↑</a>
-        <a class="btn btn-primary btn-sm" href="{{url_for('listings_sorted', sortBy='playDesc')}}" role="button">Play Rating ↓</a>
-        <a class="btn btn-primary btn-sm" href="{{url_for('listings_sorted', sortBy='enemyAsc')}}" role="button">Enemy Rating ↑</a>
-        <a class="btn btn-primary btn-sm" href="{{url_for('listings_sorted', sortBy='enemyDesc')}}" role="button">Enemy Rating ↓</a>
-        <a class="btn btn-primary btn-sm" href="{{url_for('listings_sorted', sortBy='cmcAsc')}}" role="button">Converted Mana Cost ↑</a>
-        <a class="btn btn-primary btn-sm" href="{{url_for('listings_sorted', sortBy='cmcDesc')}}" role="button">Converted Mana Cost ↓</a>
+    <div class="mb-3">
+        <div class="btn-group" role="group" aria-label="Sort Options">
+            <a class="btn btn-primary btn-sm" href="{{url_for('listings_sorted', sortBy='playAsc')}}" role="button">Play Rating ↑</a>
+            <a class="btn btn-primary btn-sm" href="{{url_for('listings_sorted', sortBy='playDesc')}}" role="button">Play Rating ↓</a>
+            <a class="btn btn-primary btn-sm" href="{{url_for('listings_sorted', sortBy='enemyAsc')}}" role="button">Enemy Rating ↑</a>
+            <a class="btn btn-primary btn-sm" href="{{url_for('listings_sorted', sortBy='enemyDesc')}}" role="button">Enemy Rating ↓</a>
+            <a class="btn btn-primary btn-sm" href="{{url_for('listings_sorted', sortBy='cmcAsc')}}" role="button">Converted Mana Cost ↑</a>
+            <a class="btn btn-primary btn-sm" href="{{url_for('listings_sorted', sortBy='cmcDesc')}}" role="button">Converted Mana Cost ↓</a>
+        </div>
     </div>
 
     {% if form2 is defined %}
-    <div class="colorIdentity">
-        <form action="{{url_for(request.endpoint, formid=2, **request.view_args)}}" method="POST">
+    <div class="colorIdentity mb-3">
+        <form id="colorForm" action="{{url_for(request.endpoint, formid=2, **request.view_args)}}" method="POST" class="form-inline">
             {{form2.hidden_tag()}}
             {{form2.white()}}
-            <i class="ms ms-shadow ms-cost ms-w"></i>
+            <label for="white">
+                <i class="ms ms-shadow {%if form2.white.data %}ms-cost{%endif%} ms-w"></i>
+            </label>
             {{form2.blue()}}
-            <i class="ms ms-shadow ms-cost ms-u"></i>
+            <label for="blue">
+                <i class="ms ms-shadow {%if form2.blue.data %}ms-cost{%endif%} ms-u"></i>
+            </label>
             {{form2.black()}}
-            <i class="ms ms-shadow ms-cost ms-b"></i>
+            <label for="black">
+                <i class="ms ms-shadow {%if form2.black.data %}ms-cost{%endif%} ms-b"></i>
+            </label>
             {{form2.red()}}
-            <i class="ms ms-shadow ms-cost ms-r"></i>
+            <label for="red">
+                <i class="ms ms-shadow {%if form2.red.data %}ms-cost{%endif%} ms-r"></i>
+            </label>
             {{form2.green()}}
-            <i class="ms ms-shadow ms-cost ms-g"></i>
+            <label for="green">
+                <i class="ms ms-shadow {%if form2.green.data %}ms-cost{%endif%} ms-g"></i>
+            </label>
             {{form2.submit(class="btn btn-secondary btn-sm")}}
         </form>
     </div>
@@ -69,13 +89,13 @@
 
 
 {% if user is defined and user.email_confirmed%}
-<div class="form-addListing">
+<div class="form-addListing mx-5">
     <h3>Add Unlisted Commander</h3>
     {{render_form(form=form, action=url_for(request.endpoint, formid=1, **request.view_args))}}
     
 </div>
 {% elif user is defined%}
-<div class="form-addListing">
+<div class="form-addListing  mx-5">
     <h3>Add Unlisted Commander</h3>
     <p>Email must be confirmed to interact.</p>
     <a class="btn btn-primary btn-sm" href="{{url_for('resend_confirmation')}}" role="'button">Send Confirmation</a>

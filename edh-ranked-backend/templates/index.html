@@ -1,9 +1,18 @@
 {% extends "base.html" %}
-{% block title %}About{% endblock %}
+{% block title %}Home{% endblock %}
 {% block content %}
-<h1>Welcome to EdhRanked!</h1>
-<br>
-<br>
-<h3>EdhRanked is the place for rating Commanders for Magic the Gathering.<br><br> Browse the <a href="{{url_for('listings')}}">listings</a> to find everyone's favorite or least favorite commander! <br><br><a href="{{url_for('register')}}">Register</a> or <a href="{{url_for('login')}}">Login</a> to start rating Commanders!</h3>
+<div class="container py-5 text-center">
+    <h1 class="display-4 mb-5">Welcome to EdhRanked!</h1>
+    <p class="lead">EdhRanked is the ultimate platform for rating Commanders for Magic the Gathering. Explore our vast listings, find everyone's favorite or least favorite commander, and join the community.</p>
 
+    <div class="mt-5">
+        <a class="btn btn-primary btn-lg mr-3 mb-3" href="{{url_for('listings')}}" role="button">Browse Listings</a>
+        {% if user is defined %}
+            <a class="btn btn-secondary btn-lg mr-3 mb-3" href="{{url_for('profile', username=user.username)}}" role="button">View Profile</a>
+        {% else %}
+            <a class="btn btn-secondary btn-lg mr-3 mb-3" href="{{url_for('register')}}" role="button">Register</a>
+            <a class="btn btn-secondary btn-lg mb-3" href="{{url_for('login')}}" role="button">Login</a>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

@@ -74,7 +74,7 @@ def confirm_email(token):
         flash("Email already confirmed!", 'warning')
         return redirect(url_for('index'))
     try:
-        email = s.loads(token, salt='email-confirm', max_age=10)
+        email = s.loads(token, salt='email-confirm', max_age=3600)
         if current_user.email != email:
             raise ValueError
         flash('Email confirmation successful!')
@@ -120,6 +120,8 @@ def logout():
 @app.route('/profile/<username>')
 def profile(username):
     kwargs = {}
+    if current_user.is_authenticated:
+        kwargs['user'] = current_user
     kwargs['profile'] = user = User.query.filter_by(username=username).first()
     kwargs['play'] = PlayRating.query.filter_by(author_id=user.id).all()
     kwargs['playListings'] = map(lambda rating: Listing.query.get(rating.listing_id), kwargs['play'])

@@ -1,59 +1,81 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/pagination.html' import render_pagination %}
-{% block title %}{{listing.name}} - Suggest Cards{% endblock %}
+{% block title %}{{listing.name}} - Suggested Cards{% endblock %}
 {% block content %}
-<h1>
-    {{listing.name}}
-</h1>
-<p>
-    Play Stars : {{listing.play_stars}} ({{listing.play_review_num}} Reviews)<br>
-    Enemy Stars : {{listing.enemy_stars}} ({{listing.enemy_review_num}} Reviews)
-</p>
-<img src="{{imgUri}}" alt="">
+<div class="container mx-5">
+    <button onclick="history.back()" class="btn btn-primary my-2">&#8592; Back</button>
+    <div class="card mb-3">
+        <div class="row g-0">
+            <div class="row-md-4 text-center">
+                <img src="{{imgUri}}" class="img-fluid rounded-start" alt="{{listing.name}}">
+            </div>
+            <div class="row-md-8">
+                <div class="card-body text-center">
+                    <h1 class="card-title">{{listing.name}}</h1>
+                    <p class="card-text">
+                        Play Stars : {{listing.play_stars}} ({{listing.play_review_num}} Reviews)<br>
+                        Enemy Stars : {{listing.enemy_stars}} ({{listing.enemy_review_num}} Reviews)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div class="suggestedCards">
-    <h2>Suggested Cards</h2>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Card Image</th>
-                <th>Name (Click to Review)</th>
-                <th>Ratings</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for card, uri, cardMap in cards|zip(imgUris, card_map) %}
-            <tr>
-                <td><img src="{{uri}}" alt=""></td> 
-                <td><h3>{% if user is defined %}<a href="{{url_for('addCardReview', listing_id=listing.id, card_id=card.id)}}">{{card.name}}</a>{% else%}{{card.name}}{% endif %}</h3></td>
-                <td><h3>&#127775; {{cardMap.play_stars}} ({{cardMap.play_review_num}} Reviews)</h3></td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {{render_pagination(card_map)}}
-    
-</div>
-{% if user is defined and user.email_confirmed %}
-<div class="addCards">
-    {% if form1 is defined %}
-    <h3>Suggest A Card That Works Well With {{listing.name}}</h3>
-    {{render_form(form1)}}
-    <!-- <form action="" method="POST">
-        {{form1.hidden_tag()}}
-        {{form1.name.label}}
-        {{form1.name()}}
-        {{form1.submit()}}
-    </form> -->
+    <div class="suggestedCards">
+        <h2>Suggested Cards</h2>
+        <div class="table-responsive">
+            <table class="table table-striped my-3">
+                <thead>
+                    <tr>
+                        <th>Card Image</th>
+                        <th>Name (Click to Review)</th>
+                        <th>Ratings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for card, uri, cardMap in cards|zip(imgUris, card_map) %}
+                    <tr>
+                        <td><img class="zoom" src="{{uri}}" alt="{{card.name}}" class="img-thumbnail"></td>
+                        <td>
+                            <h3>
+                                {% if user is defined %}
+                                    <a href="{{url_for('addCardReview', listing_id=listing.id, card_id=card.id)}}">{{card.name}}</a>
+                                {% else %}
+                                    {{card.name}}
+                                {% endif %}
+                            </h3>
+                        </td>
+                        <td>
+                            <h3>&#127775; {{cardMap.play_stars}} ({{cardMap.play_review_num}} Reviews)</h3>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{render_pagination(card_map, align='center')}}
+    </div>
+
+    {% if user is defined %}
+    <div class="addCards mx-5">
+        {% if user.email_confirmed and form1 is defined %}
+            <h3>Suggest A Card That Works Well With {{listing.name}}</h3>
+            {{render_form(form1)}}
+        {% else %}
+            <h3>To suggest a card that works well with {{listing.name}}, confirm your email first.</h3>
+            <a class="btn btn-primary btn-sm" href="{{url_for('resend_confirmation')}}" role="'button">Send Confirmation</a>
+        {% endif %}
+    </div>
     {% endif %}
 </div>
-{% elif user is defined %}
-<div class="addCards">
-    <h3>Suggest A Card That Works Well With {{listing.name}}</h3>
-    <p>Email must be confirmed to interact.</p>
-    <a class="btn btn-primary btn-sm" href="{{url_for('resend_confirmation')}}" role="'button">Send Confirmation</a>
-
-</div>
-{% endif %}
-
+<style>
+    .zoom {
+        transition: transform 0.2s; /* Animation */
+        transform-origin: left center; /* This ensures the left side stays in place while the right side expands. */
+    }
+    
+    .zoom:hover {
+        transform: scale(1.5); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
+    }
+</style>
 {% endblock %}

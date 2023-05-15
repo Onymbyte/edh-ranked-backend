@@ -1,121 +1,137 @@
 {% extends "base.html" %}
 {% block title %}{{listing.name}}{% endblock %}
 {% block content %}
-<h1>
-    {{listing.name}}
-</h1>
-<p>
-    Play Stars : {{listing.play_stars}} ({{listing.play_review_num}} Reviews)<br>
-    Enemy Stars : {{listing.enemy_stars}} ({{listing.enemy_review_num}} Reviews)<br>
-    <a class="btn btn-primary btn-sm" href="{{url_for('listing_cards', listing_id=listing.id)}}" role="button">Suggested Cards</a>
-</p>
+<div class="container my-4">
+    <button onclick="history.back()" class="btn btn-primary my-2">&#8592; Back</button>
+    <div class="text-center">
+        <h1 class="mb-3">{{listing.name}}</h1>
+        <p class="mb-3">
+            <strong>Play Stars:</strong> {{listing.play_stars}} ({{listing.play_review_num}} Reviews) |
+            <strong>Enemy Stars:</strong> {{listing.enemy_stars}} ({{listing.enemy_review_num}} Reviews)
+        </p>
+        <div class="listing-image">
+            <img src="{{imgUri}}" alt="">
+            <a class="btn btn-primary btn-sm" href="{{url_for('listing_cards', listing_id=listing.id)}}" role="button">Suggested Cards</a>
+        </div>
+        <!-- <a class="btn btn-primary btn-sm mb-3" href="{{url_for('listing_cards', listing_id=listing.id)}}" role="button">Suggested Cards</a>
+        <img class="mb-4" src="{{imgUri}}" alt="{{listing.name}}"> -->
+    </div>
 
-<img src="{{imgUri}}" alt="">
-<div class="playRatings">
-    <h2>Play Ratings</h2>
-    <table class="table table-striped">
-        <thead><tr>
-            <th>Stars</th>
-            <th>Review</th>
-            <th>Author</th>
-            <th>Post Time</th>
-        </tr></thead>
-        <tbody>
-            {% for rev in play %}
-            <tr>
-                <td>{{rev.star}} 🌟</td>
-                <td>{% if rev.review %}{{rev.review}} {% else %}[No Review]{% endif %}</td>
-                <td><a href="{{url_for('profile', username=rev.author_username)}}">{{rev.author_username}}</a></td>
-                <td>{{rev.timestamp}}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <h2 class="text-center mb-3">Play Ratings</h2>
+            {% if play %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Stars</th>
+                        <th>Review</th>
+                        <th>Author</th>
+                        <th>Post Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rev in play %}
+                    <tr>
+                        <td>{{rev.star}} 🌟</td>
+                        <td>{% if rev.review %}{{rev.review}} {% else %}[No Review]{% endif %}</td>
+                        <td><a href="{{url_for('profile', username=rev.author_username)}}">{{rev.author_username}}</a></td>
+                        <td>{{rev.timestamp}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No play ratings yet.</p>
+            {% endif %}
+            
+            {% if form1 is defined and user.email_confirmed %}
+            <h3>Add Play Rating</h3>
+            {{render_form(form1, action=url_for('listing', listing_id=listing.id, formid=1))}}
+            {% elif form1 is defined %}
+            <h3>Add Play Rating</h3>
+            <p>Email must be confirmed to interact.</p>
+            <a class="btn btn-primary btn-sm" href="{{url_for('resend_confirmation')}}" role="'button">Send Confirmation</a>
+            {% endif %}
+        </div>
 
+        <div class="col-lg-6 mb-4">
+            <h2 class="text-center mb-3">Enemy Ratings</h2>
+            {% if enemy %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Stars</th>
+                        <th>Review</th>
+                        <th>Author</th>
+                        <th>Post Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rev in enemy %}
+                    <tr>
+                        <td>{{rev.star}} 🌟</td>
+                        <td>{% if rev.review %}{{rev.review}} {% else %}[No Review]{% endif %}</td>
+                        <td><a href="{{url_for('profile', username=rev.author_username)}}">{{rev.author_username}}</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No enemy ratings yet.</p>
+            {% endif %}
+            
+            {% if form2 is defined and user.email_confirmed %}
+            <h3>Add Enemy Rating</h3>
+            {{render_form(form2, action=url_for('listing', listing_id=listing.id, formid=2))}}
+            {% elif form2 is defined %}
+            <h3>Add Enemy Rating</h3>
+            <p>Email must be confirmed to interact.</p>
+            <a class="btn btn-primary btn-sm" href="{{url_for('resend_confirmation')}}" role="'button">Send Confirmation</a>
+            {% endif %}
+        </div>
+    </div>
 
-
-    <ul>
-        {% for rev in play %}
-        <li>{{rev.star}} Star(s) : "{{rev.review}}" - {{rev.author_username}} [{{rev.timestamp}}]</li>
-
-        {% endfor %}
-    </ul>
-    <div class="rate">
-        {% if form1 is defined and user.email_confirmed %}
-        <h3>Add Play Rating</h3>
+    <div class="comments">
+        <h2 class="text-center mb-3">Comments</h2>
+        {% if comments %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Comment</th>
+                    <th>Author</th>
+                    <th>Post Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comment in comments %}
+                <tr>
+                    <td>{{comment.comment}}</td>
+                    <td><a href="{{url_for('profile', username=comment.author_username)}}">{{comment.author_username}}</a></td>
+                    <td>{{comment.timestamp}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No comments yet.</p>
+        {% endif %}
         
-        {{render_form(form1, action=url_for('listing', listing_id=listing.id, formid=1))}}
-        {% else %}
-        <h3>Add Play Rating</h3>
-        <p>Email must be confirmed to interact.</p>
-        <a class="btn btn-primary btn-sm" href="{{url_for('resend_confirmation')}}" role="'button">Send Confirmation</a>
-        {% endif %}
-
-    </div>
-</div>
-<div class="enemyRatings">
-    <h2>Enemy Ratings</h2>
-    <table class="table table-striped">
-        <thead><tr>
-            <th>Stars</th>
-            <th>Review</th>
-            <th>Author</th>
-            <th>Post Time</th>
-        </tr></thead>
-        <tbody>
-            {% for rev in enemy %}
-            <tr>
-                <td>{{rev.star}} 🌟</td>
-                <td>{% if rev.review %}{{rev.review}} {% else %}[No Review]{% endif %}</td>
-                <td><a href="{{url_for('profile', username=rev.author_username)}}">{{rev.author_username}}</a></td>
-                <td>{{rev.timestamp}}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
-    <div class="rate">
-        {% if form2 is defined and user.email_confirmed%}
-
-        <h3>Add Enemy Rating</h3>
-        {{render_form(form2, action=url_for('listing', listing_id=listing.id, formid=2))}}
-        {% else %}
-        <h3>Add Enemy Rating</h3>
+        {% if form3 is defined and user.email_confirmed %}
+        <h3>Add Comment</h3>
+        {{render_form(form3, action=url_for('listing', listing_id=listing.id, formid=3))}}
+        {% elif form3 is defined %}
+        <h3>Add Comment</h3>
         <p>Email must be confirmed to interact.</p>
         <a class="btn btn-primary btn-sm" href="{{url_for('resend_confirmation')}}" role="'button">Send Confirmation</a>
         {% endif %}
     </div>
 </div>
-
-<div class="comments">
-    <h2>Comments</h2>
-    <table class="table table-striped">
-        <thead><tr>
-            <th>Comment</th>
-            <th>Author</th>
-            <th>Post Time</th>
-        </tr></thead>
-        <tbody>
-            {% for comment in comments %}
-            <tr>
-                <td>{{comment.comment}}</td>
-                <td><a href="{{url_for('profile', username=comment.author_username)}}">{{comment.author_username}}</a></td>
-                <td>{{comment.timestamp}}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
-    {% if form3 is defined and user.email_confirmed %}
-    <h1>Add Comment</h1>
-    {{render_form(form3, action=url_for('listing', listing_id=listing.id, formid=3))}}
-    {% else %}
-    <h1>Add Comment</h1>
-    <p>Email must be confirmed to interact.</p>
-    <a class="btn btn-primary btn-sm" href="{{url_for('resend_confirmation')}}" role="'button">Send Confirmation</a>
-    {% endif %}
-</div>
-
-
+<style>
+    .listing-image {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+</style>
 {% endblock %}

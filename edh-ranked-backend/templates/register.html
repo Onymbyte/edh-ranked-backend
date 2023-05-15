@@ -1,46 +1,16 @@
 {% extends "base.html" %}
 {% block title %}Register{% endblock %}
 {% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h1 class="h3 mb-3 fw-normal text-center">Register Here</h1>
+            {{render_form(form)}}
 
-
-<h1>Register Here</h1>
-{{render_form(form)}}
-<!-- <main class="form-signup wl00 m-auto">
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
-        <h1 class="h3 mb-3 fw-normal mx-auto">Register Here</h1>
-        <div class="form-floating">
-            {{ form.username(class="form-control", id="floatingInput") }}
-            <label for="floatingInput">Username</label>
-            {% for error in form.username.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
+            <div class="mt-4 text-center">
+                <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+            </div>
         </div>
-        <div class="form-floating">
-            {{ form.email(class="form-control", id="floatingEmail") }}
-            <label for="floatingEmail">Email address</label>
-            {% for error in form.email.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </div>
-        <div class="form-floating">
-            {{ form.password(class="form-control", id="floatingPassword") }}
-            <label for="floatingPassword">Password</label>
-            {% for error in form.password.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </div>
-        <div class="form-floating">
-            {{ form.passwordConfirm(class="form-control", id="floatingPasswordConfirm") }}
-            <label for="floatingPasswordConfirm">Repeat password</label>
-            {% for error in form.passwordConfirm.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </div>
-        <br>
-        <p>{{ form.submit(class="w-100 btn btn-lg btn-primary") }}</p>
-    </form>
-</main> -->
-
+    </div>
+</div>
 {% endblock %}
-  
