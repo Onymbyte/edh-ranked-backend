@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from 'bootstrap4/pagination.html' import render_pagination %}
+{% from 'bootstrap5/pagination.html' import render_pagination %}
 {% block title %}{{listing.name}} - Suggest Cards{% endblock %}
 {% block content %}
 <h1>
@@ -34,7 +34,7 @@
     {{render_pagination(card_map)}}
     
 </div>
-{% if user is defined %}
+{% if user is defined and user.email_confirmed %}
 <div class="addCards">
     {% if form1 is defined %}
     <h3>Suggest A Card That Works Well With {{listing.name}}</h3>
@@ -46,6 +46,13 @@
         {{form1.submit()}}
     </form> -->
     {% endif %}
+</div>
+{% elif user is defined %}
+<div class="addCards">
+    <h3>Suggest A Card That Works Well With {{listing.name}}</h3>
+    <p>Email must be confirmed to interact.</p>
+    <a class="btn btn-primary btn-sm" href="{{url_for('resend_confirmation')}}" role="'button">Send Confirmation</a>
+
 </div>
 {% endif %}
 

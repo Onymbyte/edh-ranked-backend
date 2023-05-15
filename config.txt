@@ -1,2 +1,0 @@
-asdkhjfgkajsdhgjhdfbajvbhb
-mysql://onymbit:rutgers28@18.188.99.73:3306/edhRanked

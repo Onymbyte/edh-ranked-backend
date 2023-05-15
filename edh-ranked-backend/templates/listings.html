@@ -68,20 +68,18 @@
 
 
 
-
+{% if user is defined and user.email_confirmed%}
 <div class="form-addListing">
+    <h3>Add Unlisted Commander</h3>
     {{render_form(form=form, action=url_for(request.endpoint, formid=1, **request.view_args))}}
-    <!-- <form action="{{url_for(request.endpoint, formid=1, **request.view_args)}}" method="post">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.name.label }}<br>
-            {{ form.name(size=32) }}<br>
-            {% for error in form.name.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form> -->
     
 </div>
+{% elif user is defined%}
+<div class="form-addListing">
+    <h3>Add Unlisted Commander</h3>
+    <p>Email must be confirmed to interact.</p>
+    <a class="btn btn-primary btn-sm" href="{{url_for('resend_confirmation')}}" role="'button">Send Confirmation</a>
+    
+</div>
+{% endif %}
 {% endblock %}

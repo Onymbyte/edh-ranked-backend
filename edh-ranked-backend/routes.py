@@ -1,4 +1,4 @@
-from app import app, db, render_template, request, redirect, url_for
+from app import app, db, render_template, request, redirect, url_for, mail
 from forms import *
 from models import User, PlayRating, EnemyRating, Comment, Listing, CardListMap, Cards, CardRating
 from flask_login import login_user, login_required, current_user, logout_user
@@ -6,10 +6,11 @@ from time import sleep
 from scryUtil import addCommander, getImage, addCard
 from datetime import datetime
 now = datetime.utcnow
-from flask import flash
-
+from flask import flash, Markup
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired
+from flask_mail import Message
 ROWS_PER_PAGE = 5
-
+s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -18,6 +19,8 @@ def index():
     if not current_user.is_authenticated:
         return render_template("index.html")
     else:
+        if not current_user.email_confirmed:
+            flash(Markup(f"Email not confirmed. Check email confirmation! <a href='{url_for('resend_confirmation')}'>Resend?</a>"))
         return render_template("index.html", user=current_user)
 @app.route('/test', methods=['GET', 'POST'])
 def test():
@@ -32,7 +35,12 @@ def test():
         return render_template("index.html")
     else:
         return render_template("index.html", user=current_user)
-
+def send_confirmation(email):
+    token = s.dumps(email, salt='email-confirm')
+    msg = Message('Confirm Email', sender='noreply@edhranked.com', recipients=[email])
+    link = url_for('confirm_email', token=token, _external=True)
+    msg.body = 'Your confirmation link is {}'.format(link)
+    mail.send(msg)
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -44,11 +52,39 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
+        send_confirmation(form.email.data)
+        flash("Email confirmation sent!")
         return redirect(url_for('login'))
     if current_user.is_authenticated:
        return redirect(url_for('index')) 
     return render_template('register.html', form=form)
-    ret
+@app.route('/resend_confirmation')
+@login_required
+def resend_confirmation():
+    if current_user.email_confirmed:
+        flash("Email already confirmed!", 'warning')
+        return redirect(url_for('index'))
+    send_confirmation(current_user.email)
+    flash("Confirmation sent!")
+    return redirect(url_for('index'))
+@app.route('/confirm_email/<token>')
+@login_required
+def confirm_email(token):
+    if current_user.email_confirmed:
+        flash("Email already confirmed!", 'warning')
+        return redirect(url_for('index'))
+    try:
+        email = s.loads(token, salt='email-confirm', max_age=10)
+        if current_user.email != email:
+            raise ValueError
+        flash('Email confirmation successful!')
+        current_user.email_confirmed = True
+        db.session.commit()
+    except SignatureExpired:
+        flash(Markup(f"The token is expired! <a href='{url_for('resend_confirmation')}'>Resend?</a>"), 'warning')
+    except ValueError:
+        flash("Incorrect login for confirmation!", 'warning')
+    return redirect(url_for('index'))
 @app.route('/login', methods=['GET','POST'])
 def login():
   form = LoginForm(csrf_enabled=False)
@@ -84,13 +120,16 @@ def logout():
 @app.route('/profile/<username>')
 def profile(username):
     kwargs = {}
-    kwargs['user'] = user = User.query.filter_by(username=username).first()
+    kwargs['profile'] = user = User.query.filter_by(username=username).first()
     kwargs['play'] = PlayRating.query.filter_by(author_id=user.id).all()
     kwargs['playListings'] = map(lambda rating: Listing.query.get(rating.listing_id), kwargs['play'])
     kwargs['enemy'] = EnemyRating.query.filter_by(author_id=user.id).all()
     kwargs['enemyListings'] = map(lambda rating: Listing.query.get(rating.listing_id), kwargs['enemy'])
     kwargs['comments'] = Comment.query.filter_by(author_id=user.id).all()
     kwargs['commentsListings'] = map(lambda rating: Listing.query.get(rating.listing_id), kwargs['comments'])
+    if current_user.is_authenticated and not current_user.email_confirmed and user.username == current_user.username:
+        flash(Markup(f"Email not confirmed. Check email confirmation! <a href='{url_for('resend_confirmation')}'>Resend?</a>"))
+
     return render_template('profile.html', **kwargs)
 
 @app.route('/listings', methods=['GET', 'POST'])
